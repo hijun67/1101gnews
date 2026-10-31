@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>미국 증시 한눈에 · 글로벌 증시 뉴스</title>
+<meta name="description" content="미국·아시아·유럽·중동 증시 뉴스를 언론사·테마·주체별로 모아 오를 재료와 내릴 재료로 쉽게 보여줍니다.">
+<meta property="og:title" content="미국 증시 한눈에"><meta property="og:description" content="오늘 글로벌 증시 뉴스, 오를 재료 vs 내릴 재료">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📈%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#f2f4f6;--card:#fff;--tx:#191f28;--sub:#6b7684;--ln:#e5e8eb;--up:#f04452;--dn:#3182f6;--upbg:#fff0f1;--dnbg:#eaf3ff;--pri:#3182f6}
+@media(prefers-color-scheme:dark){:root{--bg:#101014;--card:#1c1c22;--tx:#f2f4f6;--sub:#9ea4ae;--ln:#2c2c35;--upbg:#3a1a1e;--dnbg:#14263f}}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:15px;line-height:1.5;padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 10px}
+header h1{font-size:20px;font-weight:800}header small{color:var(--sub);font-size:12px}
+.btn{border:0;background:var(--card);color:var(--tx);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--ln)}
+.card{background:var(--card);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+h2{font-size:17px;font-weight:800;margin-bottom:4px}.sub{color:var(--sub);font-size:12.5px}
+.up{color:var(--up)}.dn{color:var(--dn)}
+.mood{text-align:center;padding:24px 18px}.mood .em{font-size:56px;line-height:1}
+.mood .big{font-size:24px;font-weight:800;margin:8px 0 4px}
+.gauge{height:10px;border-radius:99px;background:linear-gradient(90deg,var(--dn),#c9ced6 50%,var(--up));position:relative;margin:16px 6px 6px}
+.gauge i{position:absolute;top:-5px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--tx);transform:translateX(-50%)}
+.gl{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin:0 2px}
+.item{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--ln)}.item:first-of-type{border-top:0}
+.bar{width:4px;border-radius:4px;flex:none}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;margin-right:4px}
+.t-up{background:var(--upbg);color:var(--up)}.t-dn{background:var(--dnbg);color:var(--dn)}.t-n{background:var(--ln);color:var(--sub)}
+.meta{font-size:12px;color:var(--sub);margin-bottom:3px}
+.ttl{font-weight:700;font-size:15.5px;line-height:1.4}
+.why{font-size:13px;margin-top:6px;background:var(--bg);border-radius:12px;padding:8px 10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:99px;padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer}
+.chip.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+input{width:100%;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:14px;padding:12px 14px;font-size:15px;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.theme{border-radius:16px;padding:14px;cursor:pointer;background:var(--bg)}.theme .e{font-size:26px}
+.act{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--ln);cursor:pointer}.act:first-of-type{border-top:0}
+.act .e{font-size:28px;width:40px;text-align:center}.act .mid{flex:1}
+.meter{height:8px;background:var(--bg);border-radius:9px;position:relative;margin-top:6px}
+.meter b{position:absolute;top:0;height:8px;border-radius:9px}.meter:after{content:"";position:absolute;left:50%;top:-2px;width:2px;height:12px;background:var(--sub);opacity:.4}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--ln);display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:9}
+nav button{border:0;background:none;color:var(--sub);font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;flex:1}
+nav button span{font-size:22px}nav button.on{color:var(--pri)}
+.warn{background:#fff4d6;color:#7a5600;font-size:12px;padding:10px 14px;border-radius:14px;margin-bottom:14px}
+.more{display:block;width:100%;margin-top:6px;color:var(--pri);background:none;border:0;font-size:13px;font-weight:700;cursor:pointer;padding:8px}
+.view{display:none}.view.on{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div><h1>🇺🇸 미국 증시 한눈에</h1><small>오늘 뉴스가 주가에 어떤 영향을 줄까요? <span id="upd"></span></small></div>
+<button class="btn" id="lang" onclick="ko=!ko;draw()">한글</button></header>
+<div id="sample" class="warn" style="display:none">⚠️ 지금은 실시간 기사를 불러오지 못해 <b>예시 데이터</b>를 보여드려요. 실제 보도가 아니에요.</div>
+
+<section class="view on" id="v-home"></section>
+<section class="view" id="v-news"></section>
+<section class="view" id="v-who"></section>
+<section class="view" id="v-src"></section>
+<p class="sub" style="text-align:center;padding:18px 8px;line-height:1.6">본 서비스는 공개된 뉴스 헤드라인을 자동 분류한 참고용 정보이며, 투자 권유나 수익 보장이 아닙니다.<br>호재/악재·영향도는 키워드 기반 추정이라 틀릴 수 있어요. 투자 판단과 책임은 본인에게 있습니다.</p>
+</div>
+
+<nav>
+<button class="on" onclick="go('home')"><span>🏠</span>한눈에</button>
+<button onclick="go('news')"><span>📰</span>뉴스</button>
+<button onclick="go('who')"><span>🧭</span>영향 분석</button>
+<button onclick="go('src')"><span>🏢</span>언론사</button>
+</nav>
+
+<script>
+let D,ko=true,tab='home',F={m:'',t:'',s:'',a:'',q:'',r:''},shown=15;
+const $=i=>document.getElementById(i);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const AE={'연준(Fed)':'🏦','미 정부·정책':'🏛️','빅테크·기업':'💻','월가 기관·애널':'📊','해외 중앙은행':'🌏','중국·지정학':'🧭','원유·원자재':'🛢️','개인·ETF 자금':'👥'};
+const TE={'AI·반도체':'🤖','연준·금리':'💵','실적':'🧾','에너지·원자재':'⛽','지정학·무역':'🌐','전기차·모빌리티':'🚗','금융·은행':'🏧','바이오·헬스':'💊','기타':'📰'};
+const RG=[['us','🇺🇸 미국'],['asia','🌏 아시아'],['eu','🇪🇺 유럽'],['me','🕌 중동']];
+const SO=id=>D.sources.find(s=>s.id===id)||{};
+const SN=id=>{const s=SO(id);return (s.flag||'')+' '+(s.name||id)};
+const T=x=>ko&&x.title_ko?x.title_ko:x.title_en;
+const ago=m=>m<1?'방금':m<60?m+'분 전':Math.floor(m/60)+'시간 전';
+const lab={Bullish:['▲ 오를 재료','t-up','var(--up)'],Bearish:['▼ 내릴 재료','t-dn','var(--dn)'],Neutral:['– 중립','t-n','var(--ln)']};
+const stars=n=>'★'.repeat(Math.round(n/2))+'☆'.repeat(5-Math.round(n/2));
+
+async function load(){
+  try{D=await(await fetch('/api/news')).json()}catch(e){$('v-home').innerHTML='<div class="card">서버에 연결할 수 없어요.</div>';return}
+  $('sample').style.display=D.is_sample?'block':'none';$('upd').textContent='· '+D.updated+' 기준';draw();
+}
+function go(t){tab=t;shown=15;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+t));
+  document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',['home','news','who','src'][i]===t));scrollTo(0,0)}
+function jump(k,v){F={m:'',t:'',s:'',a:'',q:'',r:''};F[k]=v;go('news');drawNews()}
+
+function item(x,full=true){
+  const L=lab[x.sentiment],link=x.url&&x.url!=='#'?` · <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:var(--pri)">원문</a>`:'';
+  return `<div class="item"><div class="bar" style="background:${L[2]}"></div><div><div class="meta"><span class="tag ${L[1]}">${L[0]}</span>$${esc(x.ticker)} · ${esc(SN(x.source))} · ${ago(x.ago)}${link}</div>
+  <div class="ttl">${esc(T(x))}</div>${x.why?`<div class="why">💡 ${esc(x.why)}</div>`:''}
+  ${full&&x.summary?`<div class="sub" style="margin-top:6px">${esc(x.summary)}</div>`:''}
+  <div class="meta" style="margin-top:6px">중요도 <span style="color:#f5a623">${stars(x.impact)}</span> · ${TE[x.theme]||''} ${esc(x.theme)}</div></div></div>`;
+}
+
+function drawHome(){
+  const I=D.items,b=I.filter(x=>x.sentiment==='Bullish'),r=I.filter(x=>x.sentiment==='Bearish'),n=Math.max(1,I.length);
+  const idx=Math.round(50+50*(b.length-r.length)/n);
+  const [em,tx,ds]=idx>=65?['😄','분위기 좋아요','오를 재료가 훨씬 많아요']:idx>=55?['🙂','대체로 괜찮아요','오를 재료가 조금 더 많아요']:idx>=45?['😐','지켜보는 중이에요','오를 재료와 내릴 재료가 비슷해요']:idx>=35?['😟','조금 조심하세요','내릴 재료가 더 많아요']:['😨','불안해요','내릴 재료가 훨씬 많아요'];
+  const top=[...I].sort((a,c)=>c.impact-a.impact)[0],byI=l=>[...l].sort((a,c)=>c.impact-a.impact).slice(0,3);
+  const act=D.actors.filter(a=>a.n)[0];
+  const rg=RG.map(([k,l])=>{const a=I.filter(x=>SO(x.source).region===k);if(!a.length)return '';const bb=a.filter(x=>x.sentiment==='Bullish').length,rr=a.filter(x=>x.sentiment==='Bearish').length,ix=Math.round(50+50*(bb-rr)/a.length);
+   return `<div class="theme" onclick="jump('r','${k}')"><div class="e">${ix>=65?'😄':ix>=55?'🙂':ix>=45?'😐':ix>=35?'😟':'😨'}</div><b>${l}</b><div class="sub">오를 <span class="up">${bb}</span> · 내릴 <span class="dn">${rr}</span></div></div>`}).join('');
+  $('v-home').innerHTML=`
+  <div class="card mood"><div class="sub">오늘의 미국 증시 뉴스 분위기</div><div class="em">${em}</div><div class="big">${tx}</div>
+   <div class="sub">${ds} · 오를 재료 <b class="up">${b.length}</b>건 / 내릴 재료 <b class="dn">${r.length}</b>건</div>
+   <div class="gauge"><i style="left:${idx}%"></i></div><div class="gl"><span>불안</span><span>보통</span><span>좋음</span></div></div>
+  <div class="card"><h2>🌍 지역별 분위기</h2><div class="sub" style="margin-bottom:10px">눌러서 그 지역 뉴스만 보세요</div><div class="grid2">${rg}</div></div>
+  <div class="card"><h2>🔥 오늘 가장 큰 소식</h2><div class="sub">중요도가 가장 높은 뉴스예요</div>${item(top)}</div>
+  <div class="card"><h2 class="up">▲ 오를 재료 TOP 3</h2>${byI(b).map(x=>item(x,false)).join('')||'<div class="sub">없어요</div>'}<button class="more" onclick="jump('m','Bullish')">오를 재료 전체 보기 ›</button></div>
+  <div class="card"><h2 class="dn">▼ 내릴 재료 TOP 3</h2>${byI(r).map(x=>item(x,false)).join('')||'<div class="sub">없어요</div>'}<button class="more" onclick="jump('m','Bearish')">내릴 재료 전체 보기 ›</button></div>
+  ${act?`<div class="card" onclick="go('who')" style="cursor:pointer"><h2>🧭 지금 시장을 움직이는 주체</h2><div class="sub" style="margin-bottom:6px">영향이 가장 큰 쪽이에요</div>${actRow(act)}</div>`:''}`;
+}
+function actRow(a){
+  const p=a.score>=0,w=Math.abs(a.score)/2,w2=Math.abs(a.score);
+  const d=w2>=40?(p?'강하게 올리는 중':'강하게 누르는 중'):w2>=15?(p?'올리는 쪽':'누르는 쪽'):'큰 영향 없음';
+  return `<div class="act" onclick="event.stopPropagation();jump('a','${esc(a.name)}')"><div class="e">${AE[a.name]||'•'}</div><div class="mid">
+   <div style="display:flex;justify-content:space-between"><b>${esc(a.name)}</b><b style="color:${p?'var(--up)':'var(--dn)'}">${d}</b></div>
+   <div class="meter"><b style="${p?'left:50%':'right:50%'};width:${w}%;background:${p?'var(--up)':'var(--dn)'}"></b></div>
+   <div class="sub" style="margin-top:4px">관련 뉴스 ${a.n}건 · 오를 ${a.bull} / 내릴 ${a.bear}</div></div></div>`;
+}
+
+function filt(){const q=F.q.toLowerCase();return D.items.filter(x=>(!F.m||x.sentiment===F.m)&&(!F.t||x.theme===F.t)&&(!F.s||x.source===F.s)&&(!F.r||SO(x.source).region===F.r)&&(!F.a||x.actors.includes(F.a))&&(!q||(x.title_en+(x.title_ko||'')+x.ticker).toLowerCase().includes(q)))}
+function chips(arr,key){return `<div class="chips">${arr.map(([v,l])=>`<button class="chip ${F[key]===v?'on':''}" onclick="F.${key}='${esc(v)}';${key==='r'?"F.s='';":''}shown=15;drawNews()">${esc(l)}</button>`).join('')}</div>`}
+function drawNews(){
+  const f=filt();
+  $('v-news').innerHTML=`<input id="q" placeholder="🔍 종목(NVDA)이나 키워드로 검색" value="${esc(F.q)}" oninput="F.q=this.value;shown=15;drawNews();const e=$('q');e.focus();e.setSelectionRange(99,99)">
+  ${chips([['','전체'],['Bullish','▲ 오를 재료'],['Bearish','▼ 내릴 재료'],['Neutral','– 중립']],'m')}
+  ${chips([['','🌍 전 세계'],...RG],'r')}
+  ${chips([['','모든 테마'],...D.themes.map(t=>[t.name,(TE[t.name]||'')+' '+t.name])],'t')}
+  ${chips([['','모든 언론사'],...D.sources.filter(s=>s.n&&(!F.r||s.region===F.r)).map(s=>[s.id,s.flag+' '+s.name])],'s')}
+  ${F.a?`<div class="sub" style="margin-bottom:8px">주체 필터: <b>${esc(F.a)}</b> <button class="chip" onclick="F.a='';drawNews()">해제 ✕</button></div>`:''}
+  <div class="card"><div class="sub">${f.length}건</div>${f.slice(0,shown).map(x=>item(x)).join('')||'<div class="sub" style="padding:20px 0;text-align:center">조건에 맞는 뉴스가 없어요</div>'}
+  ${f.length>shown?`<button class="more" onclick="shown+=15;drawNews()">더 보기 ›</button>`:''}</div>`;
+}
+function drawWho(){
+  $('v-who').innerHTML=`<div class="card"><h2>🧭 누가 시장을 움직이나요?</h2><div class="sub" style="margin-bottom:8px">빨강=오르는 쪽 · 파랑=내리는 쪽 (뉴스 중요도 반영)</div>${D.actors.filter(a=>a.n).map(actRow).join('')}</div>
+  <div class="card"><h2>🔖 테마별 이슈</h2><div class="sub" style="margin-bottom:10px">눌러서 관련 뉴스를 확인하세요</div><div class="grid2">${D.themes.map(t=>{
+    const c=t.net>0?'var(--upbg)':t.net<0?'var(--dnbg)':'var(--bg)',m=t.net>0?'<span class="up">오를 재료 우세</span>':t.net<0?'<span class="dn">내릴 재료 우세</span>':'<span class="sub">팽팽해요</span>';
+    return `<div class="theme" style="background:${c}" onclick="jump('t','${esc(t.name)}')"><div class="e">${TE[t.name]||'📰'}</div><b>${esc(t.name)}</b><div class="sub">${t.n}건 · ${m}</div></div>`}).join('')}</div></div>`;
+}
+function drawSrc(){
+  $('v-src').innerHTML=RG.map(([k,l])=>`<h2 style="margin:18px 4px 10px">${l}</h2>`+D.sources.filter(s=>s.region===k).map(s=>{const l=D.items.filter(x=>x.source===s.id).slice(0,3);
+   return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h2>${s.flag} ${esc(s.name)}</h2><span class="sub">${s.speed?'⚡'+s.speed+' · ':''}<span class="up">▲${s.bull}</span> <span class="dn">▼${s.bear}</span></span></div>
+   ${l.map(x=>item(x,false)).join('')||'<div class="sub" style="padding:10px 0">지금 불러온 기사가 없어요</div>'}${s.n>3?`<button class="more" onclick="jump('s','${s.id}')">기사 ${s.n}건 모두 보기 ›</button>`:''}</div>`}).join('')).join('');
+}
+function draw(){$('lang').textContent=ko?'한글':'English';drawHome();drawNews();drawWho();drawSrc()}
+load();setInterval(load,300000);
+</script>
+</body>
+</html>
