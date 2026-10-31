@@ -47,6 +47,13 @@ nav button span{font-size:22px}nav button.on{color:var(--pri)}
 .warn{background:#fff4d6;color:#7a5600;font-size:12px;padding:10px 14px;border-radius:14px;margin-bottom:14px}
 .more{display:block;width:100%;margin-top:6px;color:var(--pri);background:none;border:0;font-size:13px;font-weight:700;cursor:pointer;padding:8px}
 .view{display:none}.view.on{display:block}
+.cal,.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.dow{font-size:12px;color:var(--sub);margin:8px 0 4px}.dow span:first-child{color:var(--up)}.dow span:last-child{color:var(--dn)}
+.calhead{display:flex;justify-content:space-between;align-items:center}
+.day{border:0;background:var(--bg);color:var(--tx);border-radius:12px;min-height:54px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:14px}
+.day:disabled{background:none;color:var(--sub);opacity:.45;cursor:default}
+.day i{width:8px;height:8px;border-radius:50%}.day small{font-size:10px;color:var(--sub)}
+.day.today{outline:2px solid var(--pri)}.day.sel{background:var(--tx);color:var(--bg)}.day.sel small{color:var(--bg)}
 </style>
 </head>
 <body>
@@ -59,6 +66,7 @@ nav button span{font-size:22px}nav button.on{color:var(--pri)}
 <section class="view" id="v-news"></section>
 <section class="view" id="v-who"></section>
 <section class="view" id="v-src"></section>
+<section class="view" id="v-cal"></section>
 <p class="sub" style="text-align:center;padding:18px 8px;line-height:1.6">본 서비스는 공개된 뉴스 헤드라인을 자동 분류한 참고용 정보이며, 투자 권유나 수익 보장이 아닙니다.<br>호재/악재·영향도는 키워드 기반 추정이라 틀릴 수 있어요. 투자 판단과 책임은 본인에게 있습니다.</p>
 </div>
 
@@ -67,6 +75,7 @@ nav button span{font-size:22px}nav button.on{color:var(--pri)}
 <button onclick="go('news')"><span>📰</span>뉴스</button>
 <button onclick="go('who')"><span>🧭</span>영향 분석</button>
 <button onclick="go('src')"><span>🏢</span>언론사</button>
+<button onclick="go('cal')"><span>📅</span>달력</button>
 </nav>
 
 <script>
@@ -79,7 +88,7 @@ const RG=[['us','🇺🇸 미국'],['asia','🌏 아시아'],['eu','🇪🇺 유
 const SO=id=>D.sources.find(s=>s.id===id)||{};
 const SN=id=>{const s=SO(id);return (s.flag||'')+' '+(s.name||id)};
 const T=x=>ko&&x.title_ko?x.title_ko:x.title_en;
-const ago=m=>m<1?'방금':m<60?m+'분 전':Math.floor(m/60)+'시간 전';
+const ago=m=>m<1?'방금':m<60?m+'분 전':m<1440?Math.floor(m/60)+'시간 전':Math.floor(m/1440)+'일 전';
 const lab={Bullish:['▲ 오를 재료','t-up','var(--up)'],Bearish:['▼ 내릴 재료','t-dn','var(--dn)'],Neutral:['– 중립','t-n','var(--ln)']};
 const stars=n=>'★'.repeat(Math.round(n/2))+'☆'.repeat(5-Math.round(n/2));
 
@@ -88,7 +97,7 @@ async function load(){
   $('sample').style.display=D.is_sample?'block':'none';$('upd').textContent='· '+D.updated+' 기준';draw();
 }
 function go(t){tab=t;shown=15;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+t));
-  document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',['home','news','who','src'][i]===t));scrollTo(0,0)}
+  document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',['home','news','who','src','cal'][i]===t));if(t==='cal')drawCal();scrollTo(0,0)}
 function jump(k,v){F={m:'',t:'',s:'',a:'',q:'',r:''};F[k]=v;go('news');drawNews()}
 
 function item(x,full=true){
@@ -151,6 +160,38 @@ function drawSrc(){
    ${l.map(x=>item(x,false)).join('')||'<div class="sub" style="padding:10px 0">지금 불러온 기사가 없어요</div>'}${s.n>3?`<button class="more" onclick="jump('s','${s.id}')">기사 ${s.n}건 모두 보기 ›</button>`:''}</div>`}).join('')).join('');
 }
 function draw(){$('lang').textContent=ko?'한글':'English';drawHome();drawNews();drawWho();drawSrc()}
+
+/* ── 달력 / 날짜별 뉴스 ── */
+let CM=null,SEL='',DD=null,dshown=15,dm='';
+const pad=n=>String(n).padStart(2,'0'),kstToday=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Seoul'});
+function moveCal(n){CM.m+=n;if(CM.m<1){CM.m=12;CM.y--}if(CM.m>12){CM.m=1;CM.y++}drawCal()}
+async function drawCal(){
+  const today=kstToday();if(!CM)CM={y:+today.slice(0,4),m:+today.slice(5,7)};
+  const mk=`${CM.y}-${pad(CM.m)}`;let days={};
+  try{days=(await(await fetch('/api/calendar?month='+mk)).json()).days||{}}catch(e){}
+  const first=new Date(CM.y,CM.m-1,1).getDay(),last=new Date(CM.y,CM.m,0).getDate();let cells='<div></div>'.repeat(first);
+  for(let d=1;d<=last;d++){const ds=`${mk}-${pad(d)}`,c=days[ds],has=c&&c.n;
+    const col=!has?'':c.bull>c.bear?'var(--up)':c.bear>c.bull?'var(--dn)':'#9aa3ad';
+    cells+=`<button class="day ${ds===SEL?'sel':''} ${ds===today?'today':''}" ${has||ds===today?'':'disabled'} onclick="pickDay('${ds}')"><b>${d}</b>${has?`<i style="background:${col}"></i><small>${c.n}</small>`:''}</button>`}
+  $('v-cal').innerHTML=`<div class="card"><div class="calhead"><button class="btn" onclick="moveCal(-1)">‹</button><h2>${CM.y}년 ${CM.m}월</h2><button class="btn" onclick="moveCal(1)">›</button></div>
+   <div class="dow">${[...'일월화수목금토'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cal">${cells}</div>
+   <div class="sub" style="margin-top:10px">🔴 오를 재료 우세 · 🔵 내릴 재료 우세 · 숫자는 저장된 기사 수예요. 날짜를 누르면 그날 뉴스가 나와요.</div>
+   ${Object.keys(days).length?'':'<div class="sub" style="margin-top:6px">아직 저장된 날짜가 없어요. 오늘부터 매일 자동으로 쌓여요.</div>'}</div><div id="dayBox"></div>`;
+  if(SEL)showDay(SEL);
+}
+function pickDay(ds){SEL=ds;drawCal()}
+async function showDay(ds){
+  $('dayBox').innerHTML='<div class="card sub">불러오는 중…</div>';
+  try{DD=await(await fetch('/api/news?date='+ds)).json()}catch(e){$('dayBox').innerHTML='<div class="card">불러오지 못했어요</div>';return}
+  dshown=15;dm='';drawDay(ds);
+}
+function drawDay(ds){
+  const I=DD.items,b=I.filter(x=>x.sentiment==='Bullish').length,r=I.filter(x=>x.sentiment==='Bearish').length,f=I.filter(x=>!dm||x.sentiment===dm);
+  const wd='일월화수목금토'[new Date(ds+'T00:00:00').getDay()];
+  $('dayBox').innerHTML=`<div class="card"><h2>${ds} (${wd}) 뉴스</h2><div class="sub">총 ${I.length}건 · 오를 재료 <b class="up">${b}</b> / 내릴 재료 <b class="dn">${r}</b>${DD.is_sample?' · 예시 데이터':''}</div>
+   <div class="chips" style="margin-top:10px">${[['','전체'],['Bullish','▲ 오를 재료'],['Bearish','▼ 내릴 재료']].map(([v,l])=>`<button class="chip ${dm===v?'on':''}" onclick="dm='${v}';dshown=15;drawDay('${ds}')">${l}</button>`).join('')}</div>
+   ${f.slice(0,dshown).map(x=>item(x)).join('')||'<div class="sub" style="padding:14px 0">이 날짜에 저장된 뉴스가 없어요</div>'}${f.length>dshown?`<button class="more" onclick="dshown+=15;drawDay('${ds}')">더 보기 ›</button>`:''}</div>`;
+}
 load();setInterval(load,300000);
 </script>
 </body>

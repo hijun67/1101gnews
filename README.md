@@ -23,8 +23,16 @@ netlify dev      # http://localhost:8888
 
 ## 구조
 - `public/index.html` — 화면
-- `netlify/functions/news.mjs` — RSS 수집·분류·영향 분석 API
+- `netlify/functions/lib.mjs` — RSS 수집·분류·영향 분석·날짜별 보관 로직
+- `netlify/functions/news.mjs`, `calendar.mjs` — API / `collect.mjs` — 매시간 수집
 - `netlify/functions/data.mjs` — 언론사 목록, 키워드 규칙, 샘플 기사 (여기서 RSS 주소·규칙 수정)
+
+## 날짜별 뉴스 / 달력 (📅 탭)
+- 수집한 기사는 **발행일(한국시간)별로 Netlify Blobs에 저장**됩니다. 사이트 접속 시, 그리고 `collect.mjs`가 **매시간 자동으로** 쌓습니다.
+- `GET /api/calendar?month=2026-11` → 날짜별 기사 수·호재/악재 건수, `GET /api/news?date=2026-11-01` → 그날 뉴스.
+- **저장은 배포 이후부터** 쌓입니다. 과거 날짜는 RSS로 되돌려 가져올 수 없어요(RSS는 최근 기사만 제공).
+- Blobs와 예약 실행(Scheduled Functions)은 Netlify 배포 환경에서 동작하며, 로컬 `netlify dev`에서도 Blobs는 로컬 저장소로 동작합니다. 예약 실행은 production 배포에서만 돕니다.
+- 샘플 모드(RSS 수집 실패)일 때는 저장하지 않습니다.
 
 ## 알아둘 점
 - 결과는 Netlify CDN이 5분 캐시합니다. 갱신 주기를 바꾸려면 `news.mjs`의 `s-maxage=300`을 수정하세요.
