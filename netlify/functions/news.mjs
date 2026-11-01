@@ -1,6 +1,6 @@
 // GET /api/news            → 지금 수집한 실시간 뉴스
 // GET /api/news?date=YYYY-MM-DD → 해당 날짜(한국시간)에 보관된 뉴스
-import { fetchLive, summarize, archive, loadDay, kst, key } from "./lib.mjs";
+import { fetchLive, summarize, archive, translate, loadDay, kst, key } from "./lib.mjs";
 
 const json = (obj, ttl) => new Response(JSON.stringify(obj), { headers: {
   "Content-Type": "application/json; charset=utf-8",
@@ -18,7 +18,10 @@ export default async (req) => {
     return json(summarize(items), 3600);
   }
   const live = await fetchLive();
-  if (!live.is_sample) await archive(live.items).catch(() => {});
+  if (!live.is_sample) {
+    await translate(live.items, { ms: 3000, max: 25 }).catch(() => {});   // 캐시된 번역은 전부 적용, 새 번역은 최신 25건까지
+    await archive(live.items).catch(() => {});
+  }
   if (date && !live.is_sample) {                    // 오늘: 보관본 + 방금 수집분 합치기
     const old = await loadDay(date).catch(() => []);
     const seen = new Set(old.map(key));

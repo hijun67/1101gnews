@@ -27,8 +27,15 @@ netlify dev      # http://localhost:8888
 - `netlify/functions/news.mjs`, `calendar.mjs` — API / `collect.mjs` — 매시간 수집
 - `netlify/functions/data.mjs` — 언론사 목록, 키워드 규칙, 샘플 기사 (여기서 RSS 주소·규칙 수정)
 
+## 영어 제목 한글 번역
+- 영어 기사 제목은 **Claude API(기본 모델 `claude-haiku-5-5`)로 한글 번역**해서 보여주고, 원제목은 그 아래에 작게 표시합니다.
+- Netlify → Site configuration → **Environment variables** 에 `ANTHROPIC_API_KEY`를 추가하세요 (선택: `TRANSLATE_MODEL`로 모델 변경). 키가 없으면 번역 없이 영어로 나옵니다.
+- 번역 결과는 제목별로 Blobs에 저장되어 **같은 제목은 다시 번역하지 않습니다**(비용 절약). 접속 시 최신 25건까지 즉시 번역하고, 30분마다 도는 `collect.mjs`가 나머지를 처리합니다. 그래서 배포 직후엔 일부 제목이 영어로 보일 수 있어요.
+- 상단 **한글/English 버튼**으로 언제든 원문 제목으로 전환할 수 있습니다.
+- 번역은 AI 결과라 어색하거나 틀릴 수 있어 화면 하단에 안내 문구를 넣었습니다.
+
 ## 날짜별 뉴스 / 달력 (📅 탭)
-- 수집한 기사는 **발행일(한국시간)별로 Netlify Blobs에 저장**됩니다. 사이트 접속 시, 그리고 `collect.mjs`가 **매시간 자동으로** 쌓습니다.
+- 수집한 기사는 **발행일(한국시간)별로 Netlify Blobs에 저장**됩니다. 사이트 접속 시, 그리고 `collect.mjs`가 **30분마다 자동으로** 쌓습니다.
 - `GET /api/calendar?month=2026-11` → 날짜별 기사 수·호재/악재 건수, `GET /api/news?date=2026-11-01` → 그날 뉴스.
 - **저장은 배포 이후부터** 쌓입니다. 과거 날짜는 RSS로 되돌려 가져올 수 없어요(RSS는 최근 기사만 제공).
 - Blobs와 예약 실행(Scheduled Functions)은 Netlify 배포 환경에서 동작하며, 로컬 `netlify dev`에서도 Blobs는 로컬 저장소로 동작합니다. 예약 실행은 production 배포에서만 돕니다.

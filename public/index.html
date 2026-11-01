@@ -67,7 +67,7 @@ nav button span{font-size:22px}nav button.on{color:var(--pri)}
 <section class="view" id="v-who"></section>
 <section class="view" id="v-src"></section>
 <section class="view" id="v-cal"></section>
-<p class="sub" style="text-align:center;padding:18px 8px;line-height:1.6">본 서비스는 공개된 뉴스 헤드라인을 자동 분류한 참고용 정보이며, 투자 권유나 수익 보장이 아닙니다.<br>호재/악재·영향도는 키워드 기반 추정이라 틀릴 수 있어요. 투자 판단과 책임은 본인에게 있습니다.</p>
+<p class="sub" style="text-align:center;padding:18px 8px;line-height:1.6">본 서비스는 공개된 뉴스 헤드라인을 자동 분류한 참고용 정보이며, 투자 권유나 수익 보장이 아닙니다.<br>호재/악재·영향도는 키워드 기반 추정이라 틀릴 수 있어요. 투자 판단과 책임은 본인에게 있습니다.<br>한글 제목은 AI 자동 번역이라 어색할 수 있어요. 원제목은 제목 아래에 작게 함께 표시돼요.</p>
 </div>
 
 <nav>
@@ -103,7 +103,7 @@ function jump(k,v){F={m:'',t:'',s:'',a:'',q:'',r:''};F[k]=v;go('news');drawNews(
 function item(x,full=true){
   const L=lab[x.sentiment],link=x.url&&x.url!=='#'?` · <a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:var(--pri)">원문</a>`:'';
   return `<div class="item"><div class="bar" style="background:${L[2]}"></div><div><div class="meta"><span class="tag ${L[1]}">${L[0]}</span>$${esc(x.ticker)} · ${esc(SN(x.source))} · ${ago(x.ago)}${link}</div>
-  <div class="ttl">${esc(T(x))}</div>${x.why?`<div class="why">💡 ${esc(x.why)}</div>`:''}
+  <div class="ttl">${esc(T(x))}</div>${ko&&x.title_ko&&x.title_ko!==x.title_en?`<div class="sub" style="font-size:11.5px;margin-top:2px">${esc(x.title_en)}</div>`:''}${x.why?`<div class="why">💡 ${esc(x.why)}</div>`:''}
   ${full&&x.summary?`<div class="sub" style="margin-top:6px">${esc(x.summary)}</div>`:''}
   <div class="meta" style="margin-top:6px">중요도 <span style="color:#f5a623">${stars(x.impact)}</span> · ${TE[x.theme]||''} ${esc(x.theme)}</div></div></div>`;
 }
